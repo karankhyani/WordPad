@@ -15,11 +15,11 @@ public class fileOperations {
 	}
 	public void openFile(wordpad wp) {
 		JFileChooser chooser=new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("Only doc/docx files", "docx"));
+		chooser.setFileFilter(new FileNameExtensionFilter("Only RTF files", "rtf","docx"));
 		chooser.setCurrentDirectory(new File("C:/"));
 		int status=chooser.showOpenDialog(chooser);
 		File file=chooser.getSelectedFile();
-		
+		wp.file=file;
 		try {
 		FileInputStream in=new FileInputStream(file);
 		wp.kit.read(in, wp.doc, 0);
@@ -38,6 +38,7 @@ public class fileOperations {
 		chooser.setCurrentDirectory(new File("C:/"));
 		int status=chooser.showSaveDialog(chooser);
 		File file=chooser.getSelectedFile();
+		wp.file=file;
 		try {
 			FileOutputStream out=new FileOutputStream(file);
 			wp.kit.write(out, wp.doc, 0, wp.doc.getLength());
@@ -53,9 +54,10 @@ public class fileOperations {
 		}
 		else {
 			try {
-				FileOutputStream out=new FileOutputStream(file);
+				FileOutputStream out=new FileOutputStream(f);
 				wp.kit.write(out, wp.doc, 0, wp.doc.getLength());
 				savedStatus=true;
+				
 			} catch (Exception e) {
 				// TODO: handle exception
 				System.out.println(e);

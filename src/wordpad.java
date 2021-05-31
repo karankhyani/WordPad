@@ -15,13 +15,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.nio.CharBuffer;
+import java.nio.file.Files;
 import java.util.Stack;
 import java.io.*;
 import javax.swing.text.*;
 import javax.swing.text.StyleConstants.FontConstants;
 import javax.swing.text.StyleConstants.ParagraphConstants;
 import javax.swing.text.rtf.RTFEditorKit;
-
 public class wordpad   {
 	JFrame frame;
 	Container contentPane;
@@ -30,7 +30,7 @@ public class wordpad   {
 	JMenu fileMenu,editMenu,search,help;
 	JMenuItem newFileMenu,openFileMenu,saveFileMenu,saveAsFileMenu,printFileMenu,exit,cutEdit,copyEdit,pasteEdit,undoEdit,findEdit,repalceEdit,selectAllEdit,cutPop,copyPop,pastePop,replacePop,encryptPop,decryptPop;
 	JTextPane textPane;
-	JLabel statusLabel;
+	JLabel statusLabel;JLabel changesSaved;
 	JToolBar verticalToolBar,horizontalToolBar;
 	JComboBox<String> fontLists,fontSizes;
 	JSpinner fontSizeSpinner;
@@ -111,28 +111,31 @@ public class wordpad   {
 			horizontalToolBar.setFloatable(false);
 			horizontalToolBar.setLocation(66,5);
 			contentPane.add(horizontalToolBar,BorderLayout.NORTH);
-			bold=createButton(new ImageIcon("./icons/icons8-bold-52.png"), horizontalToolBar,20);
-			italic=createButton(new ImageIcon("./icons/icons8-italic-52.png"), horizontalToolBar,20);
-			underline=createButton(new ImageIcon("./icons/icons8-underline-52.png"), horizontalToolBar,20);
+			bold=createButton(new ImageIcon("./icons/icons8-bold-52.png"), horizontalToolBar,20,"Bold");
+			italic=createButton(new ImageIcon("./icons/icons8-italic-52.png"), horizontalToolBar,20,"Italic");
+			underline=createButton(new ImageIcon("./icons/icons8-underline-52.png"), horizontalToolBar,20,"UnderLine");
 			fontLists=new JComboBox<String>(fontNames);
+			fontLists.setSelectedItem("Dialog");
 			fontLists.addItemListener(itemListner);
 			horizontalToolBar.add(fontLists);
 			fontSizeSpinner=new JSpinner();
-			fontSizeSpinner.setValue(15);
+			fontSizeSpinner.setValue(20);
 			fontSizeSpinner.addChangeListener(changeListener);
 			horizontalToolBar.add(fontSizeSpinner);
-			alignLeft=createButton(new ImageIcon("./icons/icons8-align-left-96 (1).png"), horizontalToolBar,20);
-			alignCenter=createButton(new ImageIcon("./icons/icons8-align-center-96.png"), horizontalToolBar,20);
-			alignRight=createButton(new ImageIcon("./icons/icons8-align-right-96.png"), horizontalToolBar,20);			
+			alignLeft=createButton(new ImageIcon("./icons/icons8-align-left-96 (1).png"), horizontalToolBar,20,"Align Left");
+			alignCenter=createButton(new ImageIcon("./icons/icons8-align-center-96.png"), horizontalToolBar,20,"Align Center");
+			alignRight=createButton(new ImageIcon("./icons/icons8-align-right-96.png"), horizontalToolBar,20,"Align Right");			
 		}
 		
-		public JButton createButton(ImageIcon img,JToolBar tb,int size) {
+		public JButton createButton(ImageIcon img,JToolBar tb,int size,String tip) {
 			Image image=img.getImage().getScaledInstance(size, size,Image.SCALE_SMOOTH);
 			ImageIcon newImageIcon=new ImageIcon(image);
 			JButton temp =new JButton(newImageIcon);
+			temp.setToolTipText(tip);
 			temp.addActionListener(al);
 			temp.setBorder(BorderFactory.createEmptyBorder());
 			temp.setBackground(new Color(190, 221, 244));
+			temp.setEnabled(true);
 			tb.add(temp);
 			temp.setVisible(true);
 			tb.addSeparator();
@@ -156,14 +159,14 @@ public class wordpad   {
 //			verticalToolBar.setLayout(new GridLayout(20,1,1,1));
 //			verticalToolBar.setBackground(Color.LIGHT_GRAY);
 			contentPane.add(verticalToolBar,BorderLayout.WEST);
-			newBar=createButton(new ImageIcon("./icons/icons8-create-100 (1).png"),verticalToolBar,30);
-			openBar=createButton(new ImageIcon("./icons/icons8-open-document-100.png"),verticalToolBar,30);
-			saveBar=createButton(new ImageIcon("./icons/icons8-save-100.png"),verticalToolBar,30);
-			cutBar=createButton(new ImageIcon("./icons/cut.png"),verticalToolBar,30);
-			copyBar=createButton(new ImageIcon("./icons/icons8-copy-100.png"),verticalToolBar,30);
-			pasteBar=createButton(new ImageIcon("./icons/icons8-paste-100 (2).png"),verticalToolBar,30);
-			encryptBar=createButton(new ImageIcon("./icons/encryption.png"),verticalToolBar,30);
-			decryptBar=createButton(new ImageIcon("./icons/unlocked.png"),verticalToolBar,30);
+			newBar=createButton(new ImageIcon("./icons/icons8-create-100 (1).png"),verticalToolBar,30,"New");
+			openBar=createButton(new ImageIcon("./icons/icons8-open-document-100.png"),verticalToolBar,30,"Open");
+			saveBar=createButton(new ImageIcon("./icons/icons8-save-100.png"),verticalToolBar,30,"Save");
+			cutBar=createButton(new ImageIcon("./icons/cutting.png"),verticalToolBar,30,"Cut");
+			copyBar=createButton(new ImageIcon("./icons/icons8-copy-100.png"),verticalToolBar,30,"Copy");
+			pasteBar=createButton(new ImageIcon("./icons/icons8-paste-100 (2).png"),verticalToolBar,30,"Paste");
+			encryptBar=createButton(new ImageIcon("./icons/encryption.png"),verticalToolBar,30,"Encrypt");
+			decryptBar=createButton(new ImageIcon("./icons/unlocked.png"),verticalToolBar,30,"Decrypt");
 		}
 		public void createTextPane() {
 			textPane=new JTextPane();
@@ -179,11 +182,13 @@ public class wordpad   {
 			doc.addDocumentListener(documentListener);
 			textAttribute=new SimpleAttributeSet();
 			encryptAttribute=new SimpleAttributeSet();
+			
 			FontConstants.setFontFamily(textAttribute, textPane.getFont().getFamily());
 			FontConstants.setFontSize(textAttribute, textPane.getFont().getSize());
 			textPane.setParagraphAttributes(textAttribute, true);
 			textPane.addMouseListener(ml);
 			textPane.addCaretListener(caretListener);
+			
 			textPane.addKeyListener(new KeyListener() {
 				
 				@Override
@@ -305,6 +310,11 @@ public class wordpad   {
 			JLabel wc=new JLabel("Word Count:");
 			wc.setBackground(new Color(133, 193, 233));
 			panel.add(wc,BorderLayout.PAGE_END);
+			 changesSaved=new JLabel("     Changes Saved");
+			 changesSaved.setBackground(new Color(133, 193, 233));
+			 changesSaved.setEnabled(true);
+			changesSaved.setVisible(false);
+			panel.add(changesSaved);
 			contentPane.add(panel,BorderLayout.PAGE_END);
 			frame.setVisible(true);
 		}
@@ -460,6 +470,10 @@ public class wordpad   {
 				}
 				if(ae.getSource()==openBar|| ae.getSource()==openFileMenu) {
 					callOpen();
+					System.out.println(encryptAttribute);
+					System.out.println(textAttribute);
+					System.out.println("open");
+					
 				}
 				else if (ae.getSource()==saveBar||ae.getSource()==saveFileMenu) {
 						callSave();
