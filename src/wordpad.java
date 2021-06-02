@@ -13,7 +13,6 @@ import java.awt.event.*;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.nio.CharBuffer;
 import java.nio.file.Files;
 import java.util.Stack;
@@ -22,13 +21,14 @@ import javax.swing.text.*;
 import javax.swing.text.StyleConstants.FontConstants;
 import javax.swing.text.StyleConstants.ParagraphConstants;
 import javax.swing.text.rtf.RTFEditorKit;
+import javax.swing.undo.UndoManager;
 public class wordpad   {
 	JFrame frame;
 	Container contentPane;
 	JButton bold,italic,underline,alignLeft,alignRight,alignCenter,newBar,openBar,saveBar,clearBr,cutBar,copyBar,pasteBar,encryptBar,decryptBar;JButton b,i,u;
 	JMenuBar menuBar;
 	JMenu fileMenu,editMenu,search,help;
-	JMenuItem newFileMenu,openFileMenu,saveFileMenu,saveAsFileMenu,printFileMenu,exit,cutEdit,copyEdit,pasteEdit,undoEdit,findEdit,repalceEdit,selectAllEdit,cutPop,copyPop,pastePop,replacePop,encryptPop,decryptPop;
+	JMenuItem newFileMenu,openFileMenu,saveFileMenu,saveAsFileMenu,printFileMenu,exit,cutEdit,copyEdit,pasteEdit,undoEdit,redoEdit,findEdit,repalceEdit,selectAllEdit,cutPop,copyPop,pastePop,replacePop,encryptPop,decryptPop;
 	JTextPane textPane;
 	JLabel statusLabel;JLabel changesSaved;
 	JToolBar verticalToolBar,horizontalToolBar;
@@ -47,7 +47,7 @@ public class wordpad   {
 	int height,width,lineNumber=0,colNum=0;
 	fileOperations fileOps=new fileOperations();
 	CharBuffer letters=CharBuffer.allocate(1000);
-	
+	UndoManager undoManager=new UndoManager();
 	//-------------------------
 		wordpad() {
 			Toolkit kit;
@@ -83,6 +83,7 @@ public class wordpad   {
 			copyEdit= createMenuItem(editMenu, "Copy");
 			pasteEdit= createMenuItem(editMenu, "Paste");
 			undoEdit= createMenuItem(editMenu, "Undo");
+			redoEdit= createMenuItem(editMenu, "Redo");
 			findEdit= createMenuItem(editMenu, "Find");
 			repalceEdit= createMenuItem(editMenu, "Replace");
 			selectAllEdit= createMenuItem(editMenu, "SelectAll");
@@ -124,7 +125,7 @@ public class wordpad   {
 			horizontalToolBar.add(fontSizeSpinner);
 			alignLeft=createButton(new ImageIcon("./icons/icons8-align-left-96 (1).png"), horizontalToolBar,20,"Align Left");
 			alignCenter=createButton(new ImageIcon("./icons/icons8-align-center-96.png"), horizontalToolBar,20,"Align Center");
-			alignRight=createButton(new ImageIcon("./icons/icons8-align-right-96.png"), horizontalToolBar,20,"Align Right");			
+			alignRight=createButton(new ImageIcon("./icons/icons8-align-right-96.png"), horizontalToolBar,20,"Align Right");		
 		}
 		
 		public JButton createButton(ImageIcon img,JToolBar tb,int size,String tip) {
@@ -182,13 +183,12 @@ public class wordpad   {
 			doc.addDocumentListener(documentListener);
 			textAttribute=new SimpleAttributeSet();
 			encryptAttribute=new SimpleAttributeSet();
-			
 			FontConstants.setFontFamily(textAttribute, textPane.getFont().getFamily());
 			FontConstants.setFontSize(textAttribute, textPane.getFont().getSize());
 			textPane.setParagraphAttributes(textAttribute, true);
 			textPane.addMouseListener(ml);
 			textPane.addCaretListener(caretListener);
-			
+			doc.addUndoableEditListener(undolistener);
 			textPane.addKeyListener(new KeyListener() {
 				
 				@Override
@@ -222,6 +222,7 @@ public class wordpad   {
 			@Override
 			public void undoableEditHappened(UndoableEditEvent e) {
 				// TODO Auto-generated method stub
+				undoManager.addEdit(e.getEdit());
 				
 			}
 		};
@@ -418,6 +419,7 @@ public class wordpad   {
 			temp.addActionListener(al);
 			temp.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
 			return temp;
+			
 		}
 		MouseListener ml=new MouseListener() {
 			
@@ -470,12 +472,24 @@ public class wordpad   {
 				}
 				if(ae.getSource()==openBar|| ae.getSource()==openFileMenu) {
 					callOpen();
+					objectOut out=new objectOut();
+					try {
+						encryptAttribute= out.readObjectFile();
+					} catch (ClassNotFoundException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					System.out.println(encryptAttribute);
-					System.out.println(textAttribute);
-					System.out.println("open");
 					
 				}
 				else if (ae.getSource()==saveBar||ae.getSource()==saveFileMenu) {
+					objectOut out=new objectOut();
+					try {
+						out.writeObjectToFile(encryptAttribute);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 						callSave();
 				}
 				else if (ae.getSource()==saveAsFileMenu) {
@@ -561,12 +575,14 @@ public class wordpad   {
 						callSaveScreen();
 					}
 				}
-				else if (ae.getSource()==search) {
-					
-					
+				else if (ae.getSource()==undoEdit) {
+					undoManager.undo();
 				}
-			}
-		};
+				else if (ae.getSource()==redoEdit) {
+					undoManager.redo();
+				}
+			}//actionPerformed method
+		};//ActionListener inner class
 		
 		
 		
