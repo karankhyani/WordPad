@@ -41,7 +41,7 @@ public class saveScreen  {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				if(e.getSource()==save) {
-					wp.fileOps.saveFile(wp, wp.file);
+					wp.work.fileOps.saveFile(wp, wp.file);
 				}
 				
 			}
