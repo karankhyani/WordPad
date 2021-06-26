@@ -211,6 +211,10 @@ public class working{
 			else if(ae.getSource()==wordpad.pasteBar||ae.getSource()==wordpad.pasteEdit||ae.getSource()==wordpad.pastePop) {
 				wordpad.textPane.paste();
 			}
+			else if(ae.getSource()==wordpad.findEdit) {
+				findScreen objFindScreen=new findScreen(wordpad);
+				
+			}
 			else if(ae.getSource()==wordpad.replacePop||ae.getSource()==wordpad.repalceEdit) {
 				callReplaceScreen(wordpad.textPane.getSelectedText());
 			}

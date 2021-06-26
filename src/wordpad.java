@@ -46,6 +46,7 @@ public class wordpad   {
 			ImageIcon mainIcon=new ImageIcon("./icons/notepad.png");
 			frame.setIconImage(mainIcon.getImage());
 			frame.setBackground(new Color(214, 234, 248));
+			frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icons/notepad.png"));
 			}
 		public void createMenuBar() {
 			menuBar=new JMenuBar();
