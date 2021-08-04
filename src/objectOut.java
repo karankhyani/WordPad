@@ -9,16 +9,22 @@ import java.io.ObjectOutputStream;
 import javax.swing.text.SimpleAttributeSet;
 
 public class objectOut {
-	File file=new File("./kk");
+	File file;
 	
-	public objectOut() {
+	public objectOut(File f){
 		// TODO Auto-generated constructor stub
+		if(f!=null) {
+		String path=f.getAbsolutePath();
+		path=path.substring(0, path.lastIndexOf('.'));
+//		System.out.println(path);
+		file=new File(path);
+		}
 	}
 	public void writeObjectToFile(SimpleAttributeSet obj) throws IOException {
-		
+		if(file!=null) {
 		FileOutputStream fileOutputStream=new FileOutputStream(file);
 		ObjectOutputStream objectOutputStream=new ObjectOutputStream(fileOutputStream);
-		objectOutputStream.writeObject(obj);
+		objectOutputStream.writeObject(obj);}
 	}
 	
 	public SimpleAttributeSet readObjectFile() throws IOException, ClassNotFoundException {

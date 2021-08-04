@@ -1,5 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.*;
 import java.nio.CharBuffer;
 import javax.swing.text.*;
@@ -10,10 +13,10 @@ public class wordpad   {
 	Container contentPane;
 	JButton bold,italic,underline,alignLeft,alignRight,alignCenter,newBar,openBar,saveBar,clearBr,cutBar,copyBar,pasteBar,encryptBar,decryptBar;JButton b,i,u;
 	JMenuBar menuBar;
-	JMenu fileMenu,editMenu,search,help;
+	JMenu fileMenu,editMenu,help,tools;
 	JMenuItem newFileMenu,openFileMenu,saveFileMenu,saveAsFileMenu,printFileMenu,exit,cutEdit,copyEdit,pasteEdit,undoEdit,redoEdit,findEdit,repalceEdit,selectAllEdit,cutPop,copyPop,pastePop,replacePop,encryptPop,decryptPop;
 	JTextPane textPane;
-	JLabel statusLabel;JLabel changesSaved;
+	JLabel statusLabel;JLabel changesSaved;JLabel wc;
 	JToolBar verticalToolBar,horizontalToolBar;
 	JComboBox<String> fontLists,fontSizes;
 	JSpinner fontSizeSpinner;
@@ -30,6 +33,8 @@ public class wordpad   {
 	int height,width,lineNumber=0,colNum=0;
 	CharBuffer letters=CharBuffer.allocate(1000);
 	working work=new working(this);
+	JPanel panel;
+	JCheckBox viewstatus;
 	//-------------------------
 		wordpad() {
 			Toolkit kit;
@@ -38,7 +43,7 @@ public class wordpad   {
 			height=screenSize.height;
 			width=screenSize.width;
 			frame=new JFrame("WordPad");
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			frame.setSize(700, 700);
 			frame.setMinimumSize(new Dimension(200,200));
 			contentPane=frame.getContentPane();
@@ -47,6 +52,8 @@ public class wordpad   {
 			frame.setIconImage(mainIcon.getImage());
 			frame.setBackground(new Color(214, 234, 248));
 			frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icons/notepad.png"));
+			
+			frame.addWindowListener(work.windowListener);
 			}
 		public void createMenuBar() {
 			menuBar=new JMenuBar();
@@ -68,12 +75,16 @@ public class wordpad   {
 			findEdit= createMenuItem(editMenu, "Find",new ImageIcon("./icons/small-icons/icons8-search-16.png"));
 			repalceEdit= createMenuItem(editMenu, "Replace",new ImageIcon("./icons/small-icons/icons8-copy-to-clipboard-16.png"));
 			selectAllEdit= createMenuItem(editMenu, "SelectAll",new ImageIcon("./icons/small-icons/icons8-select-all-16.png"));
-			search=new JMenu("Search");
+			tools=new JMenu("Tools");
 			help=new JMenu("Help");
 			menuBar.add(fileMenu);
 			menuBar.add(editMenu);
-			menuBar.add(search);
-			menuBar.add(help);
+			viewstatus=new JCheckBox("View StatusBar",true);
+			viewstatus.setBackground(new Color(190, 221, 244));
+			viewstatus.addItemListener(work.itemListner);
+			tools.add(viewstatus);
+			menuBar.add(tools);
+//			menuBar.add(help);
 			menuBar.setVisible(true);
 			menuBar.setSize(width, 20);
 			frame.setJMenuBar(menuBar);
@@ -100,10 +111,12 @@ public class wordpad   {
 			underline=createButton(new ImageIcon("./icons/icons8-underline-52.png"), horizontalToolBar,20,"UnderLine");
 			fontLists=new JComboBox<String>(fontNames);
 			fontLists.setSelectedItem("Dialog");
+			
 			fontLists.addItemListener(work.itemListner);
 			horizontalToolBar.add(fontLists);
 			fontSizeSpinner=new JSpinner();
 			fontSizeSpinner.setValue(20);
+			
 			fontSizeSpinner.addChangeListener(work.changeListener);
 			horizontalToolBar.add(fontSizeSpinner);
 			alignLeft=createButton(new ImageIcon("./icons/icons8-align-left-96 (1).png"), horizontalToolBar,20,"Align Left");
@@ -166,19 +179,20 @@ public class wordpad   {
 			encryptAttribute=new SimpleAttributeSet();
 			FontConstants.setFontFamily(textAttribute, textPane.getFont().getFamily());
 			FontConstants.setFontSize(textAttribute, textPane.getFont().getSize());
+			textPane.setCharacterAttributes(textAttribute, true);
 			textPane.setParagraphAttributes(textAttribute, true);
 			textPane.addMouseListener(work.ml);
 			textPane.addCaretListener(work.caretListener);
 			doc.addUndoableEditListener(work.undolistener);
 		}
 		public void createStatusLabel() {
-			JPanel panel=new JPanel();
+			panel=new JPanel();
 			panel.setBackground(new Color(190, 221, 244));
 			panel.setLayout(new FlowLayout());
 			statusLabel=new JLabel("Line:"+lineNumber+" Column:"+colNum+"        ",JLabel.RIGHT);
 			statusLabel.setBackground(new Color(133, 193, 233));
 			panel.add(statusLabel,BorderLayout.PAGE_START);
-			JLabel wc=new JLabel("Word Count:");
+			wc=new JLabel("Word Count:0");
 			wc.setBackground(new Color(133, 193, 233));
 			panel.add(wc,BorderLayout.PAGE_END);
 			 changesSaved=new JLabel("     Changes Saved");
@@ -205,11 +219,10 @@ public class wordpad   {
 				end=textPane.getSelectionEnd();
 				String encryptedText=AES.encrypt(textPane.getSelectedText(), key);
 				encryptAttribute.addAttribute(encryptedText, key);
-				StyleConstants.setForeground(encryptAttribute, Color.red);
-				textPane.setCharacterAttributes(encryptAttribute, true);
-				System.out.println(encryptAttribute.getAttribute(encryptedText));
+//				StyleConstants.setForeground(encryptAttribute, Color.red);
+//				textPane.setCharacterAttributes(encryptAttribute, true);
 				try {
-					doc.insertString(start, encryptedText, encryptAttribute);
+					doc.insertString(start, encryptedText, textAttribute);
 				} catch (Exception e) {
 					// TODO: handle exception
 					System.out.println(e);
@@ -279,6 +292,7 @@ public class wordpad   {
 		}
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
+		
 		wordpad  obj =new wordpad();
 		obj.createMenuBar();
 		obj.createHorizontalToolbar();
@@ -287,5 +301,12 @@ public class wordpad   {
 		obj.createTextPane();
 		obj.createStatusLabel();
 		obj.createPopup();
+		StyleConstants.setFontFamily(obj.textAttribute, obj.fontLists.getSelectedItem().toString());
+		obj.textPane.setCharacterAttributes(obj.textAttribute, true);
+		StyleConstants.setFontSize(obj.textAttribute,(int)obj.fontSizeSpinner.getValue());
+		obj.textPane.setCharacterAttributes(obj.textAttribute, true);
+		UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		
+		
 	}
 }

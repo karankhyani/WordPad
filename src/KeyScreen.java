@@ -22,41 +22,45 @@ public class KeyScreen {
 	JTextField tf;
 	KeyScreen(wordpad wp,String task){
 		JDialog keyFrame=new JDialog();
-		keyFrame.setSize(400, 200);
+		keyFrame.setTitle(task.toUpperCase());
+		keyFrame.setSize(400, 185);
 		keyFrame.setResizable(false);
 		keyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		keyFrame.setLocation(500, 300);
 		Container cpContainer=keyFrame.getContentPane();
-		JPanel panel=new JPanel();
-		panel.setBackground(Color.white);
-		panel.setLayout(new GridLayout(3,1,10,10));
+		cpContainer.setBackground(Color.white);
+		cpContainer.setLayout(null);
 		JLabel label=new JLabel("Enter the secret key for "+task);
 		label.setFont(new Font("Times New Roman",Font.PLAIN,20));
 		label.setBackground(Color.white);
-		label.setLayout(null);
+		label.setBounds(10, 25, 350, 25);
+		cpContainer.add(label);
 		tf=new JTextField();
 		tf.setEditable(true);
-		tf.setBounds(50, 100, 200, 50);
+		tf.setBounds(10, 55, 350, 35);
 		tf.requestFocus();
 		tf.setBackground(Color.white);
-		JLabel loweLabel=new JLabel();
-		loweLabel.setLayout(new FlowLayout());
-		 submit=new JButton("Submit");
-		 cancel=new JButton("Cancel");
-		loweLabel.add(submit);
-		loweLabel.add(cancel);
-		loweLabel.setBackground(Color.white);
-		panel.add(label);
-		panel.add(tf);
-		panel.add(loweLabel);
-		panel.setVisible(true);
-		label.setVisible(true);
-		tf.setVisible(true);
-		loweLabel.setVisible(true);
-		cpContainer.add(panel);
+		cpContainer.add(tf);
+		submit=new JButton("Submit");
+		submit.setBounds(90, 100, 100, 30);
+		cancel=new JButton("Cancel");
+		cancel.setBounds(200, 100, 100, 30);
+		cpContainer.add(submit);
+		cpContainer.add(cancel);
+		
+		
+		
 		keyFrame.setAlwaysOnTop(true);
 		keyFrame.setResizable(false);
 		keyFrame.setVisible(true);
+		cancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				keyFrame.dispose();
+			}
+		});
 		submit.addActionListener(new ActionListener() {
 			
 			@Override

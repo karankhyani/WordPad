@@ -7,39 +7,42 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class replaceScreen {
-	JFrame frame;
+	JDialog frame;
 	JTextField tField;
 	JButton submit;
 	public replaceScreen(wordpad wp, String str) {
 		// TODO Auto-generated constructor stub
-		frame=new JFrame("Replace with:");
-		frame.setSize(400, 200);
+		frame=new JDialog();
+		frame.setTitle("Replace");
+		frame.setSize(385, 185);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setLocation(500, 350);
+		frame.setLocation(500, 300);
 		Container cp=frame.getContentPane();
+		cp.setLayout(null);
+		cp.setBackground(Color.white);
 		
-		JPanel panel=new JPanel();
-		panel.setLayout(new GridLayout(3,1,0,20));
-		panel.setBackground(Color.white);
 		
 		JLabel label=new JLabel("Replace "+str+" with:");
 		label.setFont(new Font("Times New Roman",Font.PLAIN,20));
-		panel.add(label);
+		label.setBounds(10, 25, 350, 25);
+		cp.add(label);
 		
 		tField=new JTextField();
-		panel.add(tField);
 		tField.requestFocus();
-		
+		tField.setBounds(10, 55, 350, 35);
+		cp.add(tField);
 		submit=new JButton("Submit");
-		submit.setFont(new Font(submit.getFont().getFamily(),Font.PLAIN,18));
 		submit.setBackground(Color.white);
 		submit.setBorder(BorderFactory.createEmptyBorder());
+		submit.setBounds(140, 100, 100, 30);
+		cp.add(submit);
 		submit.addActionListener(new ActionListener() {
 			
 			@Override
@@ -51,8 +54,7 @@ public class replaceScreen {
 				frame.dispose();
 			}
 		});
-		panel.add(submit);
-		cp.add(panel);
+		
 		frame.setVisible(true);
 		frame.setResizable(false);
 		

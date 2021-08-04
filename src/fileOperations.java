@@ -15,11 +15,16 @@ public class fileOperations {
 	}
 	public void openFile(wordpad wp) {
 		JFileChooser chooser=new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("Only RTF files", "rtf","docx"));
+		chooser.setFileFilter(new FileNameExtensionFilter("Only RTF files", "rtf"));
 		chooser.setCurrentDirectory(new File("C:/"));
 		int status=chooser.showOpenDialog(chooser);
 		File file=chooser.getSelectedFile();
+		if(file==null) {
+			
+		}
+		else {
 		wp.file=file;
+		
 		try {
 		FileInputStream in=new FileInputStream(file);
 		wp.kit.read(in, wp.doc, 0);
@@ -31,14 +36,36 @@ public class fileOperations {
 			System.out.println(e);
 			
 		}
+		objectOut outObject=new objectOut(wp.file);
+		try {
+			wp.encryptAttribute= outObject.readObjectFile();
+			//wp.textPane.setCharacterAttributes(wp.textAttribute, true);
+//			System.out.println(outObject.readObjectFile()+"  read object file ");
+//			System.out.println(wp.textAttribute+" file ops ->textatt");
+//			System.out.println(wp.encryptAttribute+" fileops-> enc att");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		}
 	}
 	public void saveAsFile(wordpad wp) {
 		JFileChooser chooser=new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("Only doc/docx files", "docx"));
+		chooser.setFileFilter(new FileNameExtensionFilter("Only RTF files", "rtf"));
 		chooser.setCurrentDirectory(new File("C:/"));
 		int status=chooser.showSaveDialog(chooser);
 		File file=chooser.getSelectedFile();
 		wp.file=file;
+		objectOut outObject=new objectOut(wp.file);
+		try {
+			outObject.writeObjectToFile(wp.encryptAttribute);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try {
 			FileOutputStream out=new FileOutputStream(file);
 			wp.kit.write(out, wp.doc, 0, wp.doc.getLength());
@@ -53,15 +80,26 @@ public class fileOperations {
 			saveAsFile(wp);
 		}
 		else {
+			objectOut outObject=new objectOut(f);
+			try {
+				outObject.writeObjectToFile(wp.encryptAttribute);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			try {
 				FileOutputStream out=new FileOutputStream(f);
 				wp.kit.write(out, wp.doc, 0, wp.doc.getLength());
 				savedStatus=true;
+				wp.changesSaved.setVisible(true);
+//				wait(1000);
+				wp.changesSaved.setVisible(false);
 				
 			} catch (Exception e) {
 				// TODO: handle exception
 				System.out.println(e);
 			}	
+			
 		}
 		
 	}
