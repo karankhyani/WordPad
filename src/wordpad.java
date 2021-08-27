@@ -1,8 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.CharBuffer;
 import javax.swing.text.*;
@@ -40,6 +44,7 @@ public class wordpad   {
 			Toolkit kit;
 			kit=Toolkit.getDefaultToolkit();
 			Dimension screenSize=kit.getScreenSize();
+			System.out.println(screenSize);
 			height=screenSize.height;
 			width=screenSize.width;
 			frame=new JFrame("WordPad");
@@ -165,6 +170,7 @@ public class wordpad   {
 		}
 		public void createTextPane() {
 			textPane=new JTextPane();
+			textPane.setSelectionColor(Color.yellow);
 			textPane.setBackground(new Color(214, 234, 248));
 			textPane.setEditable(true);
 			textPane.setContentType("txt/docx");
@@ -184,6 +190,7 @@ public class wordpad   {
 			textPane.addMouseListener(work.ml);
 			textPane.addCaretListener(work.caretListener);
 			doc.addUndoableEditListener(work.undolistener);
+			
 		}
 		public void createStatusLabel() {
 			panel=new JPanel();

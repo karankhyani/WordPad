@@ -70,6 +70,7 @@ public class fileOperations {
 			FileOutputStream out=new FileOutputStream(file);
 			wp.kit.write(out, wp.doc, 0, wp.doc.getLength());
 			savedStatus=true;
+			wp.frame.setTitle(file.getName()+" -WordPad");
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e);

@@ -1,5 +1,8 @@
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -55,14 +58,17 @@ public class working{
 		@Override
 		public void caretUpdate(CaretEvent e) {
 			
+			
+			
 //			System.out.println(wordpad.textAttribute);
 			MutableAttributeSet sample =(wordpad.textPane.getInputAttributes());
-//			System.out.println(sample+" caret mutable attribute\n"+i++);
+//			
+			System.out.println(sample+" caret mutable attribute\n"+i++);
 			if(!(wordpad.fontLists.getSelectedItem().equals(wordpad.textPane.getInputAttributes().getAttribute(StyleConstants.FontFamily)))) {
 				wordpad.fontLists.setSelectedItem(wordpad.textPane.getInputAttributes().getAttribute(StyleConstants.FontFamily));
 			}
-			if((wordpad.fontSizeSpinner.getValue()!=wordpad.textPane.getInputAttributes().getAttribute(StyleConstants.FontSize))) {
-				wordpad.fontSizeSpinner.setValue(wordpad.textPane.getInputAttributes().getAttribute(StyleConstants.FontSize));
+			if((wordpad.fontSizeSpinner.getValue()!=sample.getAttribute(StyleConstants.FontSize))) {
+				wordpad.fontSizeSpinner.setValue(sample.getAttribute(StyleConstants.FontSize));
 			}
 			if( sample.getAttribute(StyleConstants.Bold)!=null) {
 				if((boolean)sample.getAttribute(StyleConstants.Bold)) {
@@ -70,7 +76,15 @@ public class working{
 				wordpad.b.setBorder(BorderFactory.createLineBorder(Color.black));
 				StyleConstants.setBold(wordpad.textAttribute, true);
 				}
+				else 
+				{
+					wordpad.textAttribute.removeAttribute(StyleConstants.Bold);
+					wordpad.bold.setBorder(BorderFactory.createEmptyBorder());
+					wordpad.b.setBorder(BorderFactory.createEmptyBorder());
+					
+				}
 			}
+			
 			else 
 				{
 					wordpad.textAttribute.removeAttribute(StyleConstants.Bold);
@@ -204,17 +218,29 @@ public class working{
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			// TODO Auto-generated method stub
-			if(ae.getSource()==wordpad.newBar||ae.getSource()==wordpad.newFileMenu) {
-//				textPane.setText(null);
-//				frame.setTitle("WordPad");
-				wordpad objnew =new wordpad();
-				objnew.createMenuBar();
-				objnew.createHorizontalToolbar();
-				objnew.createVerticalToolbar();
-				objnew.createTextPane();
-				objnew.createStatusLabel();
-				objnew.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			}
+//			if(ae.getSource()==wordpad.newBar||ae.getSource()==wordpad.newFileMenu) {
+////				textPane.setText(null);
+////				frame.setTitle("WordPad");
+//				wordpad objnew =new wordpad();
+//				objnew.createMenuBar();
+//				objnew.createHorizontalToolbar();
+//				objnew.createVerticalToolbar();
+//				objnew.createTextPane();
+//				objnew.createStatusLabel();
+//				objnew.createPopup();
+//				StyleConstants.setFontFamily(objnew.textAttribute, objnew.fontLists.getSelectedItem().toString());
+//				objnew.textPane.setCharacterAttributes(objnew.textAttribute, true);
+//				StyleConstants.setFontSize(objnew.textAttribute,(int)objnew.fontSizeSpinner.getValue());
+//				objnew.textPane.setCharacterAttributes(objnew.textAttribute, true);
+//				try {
+//					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+//						| UnsupportedLookAndFeelException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				objnew.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//			}
 			if(ae.getSource()==wordpad.openBar|| ae.getSource()==wordpad.openFileMenu) {
 				callOpen();
 			}
@@ -333,6 +359,60 @@ public class working{
 				else {
 					callSaveScreen();
 				}
+			}
+			else if(ae.getSource()==wordpad.newFileMenu|| ae.getSource()==wordpad.newBar) {
+				if (fileOps.savedStatus==true) {
+					
+					wordpad.textPane.setText("");
+					wordpad.frame.setTitle("Wordpad");
+					wordpad.file=null;
+				}
+				else {
+					JDialog frame;
+					frame=new JDialog();
+					frame.setTitle("File not saved");
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					frame.setSize(400, 150);
+					frame.setLocation(500, 350);
+					frame.setResizable(false);
+					
+					Container cp=frame.getContentPane();
+					cp.setBackground(Color.white);
+					cp.setLayout(new GridLayout(2,1,10,10));
+					JLabel label=new JLabel("The changes made to this file will be lost. Continue?");
+					label.setFont(new Font( "Times New Roman",Font.PLAIN,16));
+					JButton cont=new JButton("Continue");
+					
+					JButton cancel=new JButton("Cancel");
+					cp.add(label);
+					JPanel panel=new JPanel();
+					panel.setBackground(Color.white);
+					panel.setLayout(new FlowLayout());
+					panel.add(cont);
+					panel.add(cancel);
+					cp.add(panel);
+					frame.setVisible(true);
+					cont.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							wordpad.textPane.setText("");
+							wordpad.file=null;
+							wordpad.frame.setTitle("Wordpad");
+							frame.dispose();
+						}
+					});
+					cancel.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							frame.dispose();
+						}
+					});
+				}
+				
 			}
 			else if (ae.getSource()==wordpad.undoEdit) {
 				undoManager.undo();
